@@ -1,27 +1,83 @@
 #
-# Copyright 2014 John Bellone <jbellone@bloomberg.net>
-# Copyright 2014 Bloomberg Finance L.P.
+# Cookbook: consul
+# License: Apache 2.0
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Copyright 2014-2016, Bloomberg Finance L.P.
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+include_recipe 'chef-sugar::default'
 
-case node['consul']['install_method']
-when 'binary'
-  include_recipe 'consul::install_binary'
-when 'source'
-  include_recipe 'consul::install_source'
-when 'packages'
-  include_recipe 'consul::install_packages'
-else
-  Chef::Application.fatal!("[consul::default] unknown install method, method=#{node['consul']['install_method']}")
+if rhel?
+  include_recipe 'yum-epel::default' if node['platform_version'].to_i == 5
+end
+
+node.default['nssm']['install_location'] = '%WINDIR%'
+
+if node['firewall']['allow_consul']
+  include_recipe 'firewall::default'
+
+  # Don't open ports that we've disabled
+  ports = node['consul']['config']['ports'].select { |_name, port| port != -1 }
+
+  firewall_rule 'consul' do
+    protocol :tcp
+    port ports.values
+    action :create
+    command :allow
+  end
+
+  firewall_rule 'consul-udp' do
+    protocol :udp
+    port ports.values_at('serf_lan', 'serf_wan', 'dns')
+    action :create
+    command :allow
+  end
+end
+
+unless windows?
+  group node['consul']['service_group'] do
+    system true
+  end
+
+  user node['consul']['service_user'] do
+    shell '/bin/bash'
+    group node['consul']['service_group']
+    system true
+  end
+end
+
+service_name = node['consul']['service_name']
+config = consul_config service_name do |r|
+  unless windows?
+    owner node['consul']['service_user']
+    group node['consul']['service_group']
+  end
+  node['consul']['config'].each_pair { |k, v| r.send(k, v) }
+  notifies :reload, "consul_service[#{service_name}]", :delayed
+end
+
+consul_installation "Consul WebUI: #{node['consul']['version']}" do
+  provider :webui
+  version node['consul']['version']
+  options symlink_to: config.ui_dir if config.ui_dir
+  only_if { config.ui == true }
+end
+
+install = consul_installation node['consul']['version'] do |r|
+  if node['consul']['installation']
+    node['consul']['installation'].each_pair { |k, v| r.send(k, v) }
+  end
+end
+
+consul_service service_name do |r|
+  version node['consul']['version']
+  config_file config.path
+  program install.consul_program
+
+  unless windows?
+    user node['consul']['service_user']
+    group node['consul']['service_group']
+  end
+  if node['consul']['service']
+    node['consul']['service'].each_pair { |k, v| r.send(k, v) }
+  end
 end
