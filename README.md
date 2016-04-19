@@ -1,491 +1,216 @@
 consul-cookbook
 ===============
+[![Build Status](https://img.shields.io/travis/johnbellone/consul-cookbook.svg)](https://travis-ci.org/johnbellone/consul-cookbook)
+[![Code Quality](https://img.shields.io/codeclimate/github/johnbellone/consul-cookbook.svg)](https://codeclimate.com/github/johnbellone/consul-cookbook)
+[![Test Coverage](https://codeclimate.com/github/johnbellone/consul-cookbook/badges/coverage.svg)](https://codeclimate.com/github/johnbellone/consul-cookbook/coverage)
+[![Cookbook Version](https://img.shields.io/cookbook/v/consul.svg)](https://supermarket.chef.io/cookbooks/consul)
+[![License](https://img.shields.io/badge/license-Apache_2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-[![Join the chat at https://gitter.im/johnbellone/consul-cookbook](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/johnbellone/consul-cookbook?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-![Release](http://img.shields.io/github/release/johnbellone/consul-cookbook.svg)
-[![Build Status](http://img.shields.io/travis/johnbellone/consul-cookbook.svg)][5]
-[![Code Coverage](http://img.shields.io/coveralls/johnbellone/consul-cookbook.svg)][6]
+[Application cookbook][0] which installs and configures [Consul][1].
 
-Installs and configures [Consul][1] client, server and UI.
+Consul is a tool for discovering and configuring services within your
+infrastructure. This is an application cookbook which takes a
+simplified approach to configuring and installing
+Consul. Additionally, it provides Chef primitives for more advanced
+configuration.
 
-## Supported Platforms
-- CentOS 6.5, 7.0
-- RHEL 6.5, 7.0
+## Basic Usage
+For most infrastructure we suggest first starting with the default
+recipe. This installs and configures Consul from the latest supported
+release. It is also what is used to certify platform support through
+the use of our integration tests.
+
+This cookbook provides node attributes which are used to fine tune
+the default recipe which installs and configures Consul. These values
+are passed directly into the Chef resource/providers which are exposed
+for more advanced configuration.
+
+Out of the box the following platforms are certified to work and are
+tested using our [Test Kitchen][8
+] configuration. Additional platforms
+_may_ work, but your mileage may vary.
+
+- CentOS (RHEL) 5.11, 6.7, 7.2
 - Ubuntu 12.04, 14.04
-- Arch Linux
+- Windows 2012r2
+- Debian 7.9, 8.2
+- FreeBSD 10.2
 
-## Attributes
-
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><tt>['consul']['version']</tt></td>
-    <td>String</td>
-    <td>Version to install</td>
-    <td><tt>0.5.0</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['base_url']</tt></td>
-    <td>String</td>
-    <td>Base URL for binary downloads</td>
-    <td><tt>https://dl.bintray.com/mitchellh/consul/</tt></td>
-  </tr>
-   <tr>
-    <td><tt>['consul']['encrypt']</tt></td>
-    <td>String</td>
-    <td>Encryption string for consul cluster.</td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['install_method']</tt></td>
-    <td>String</td>
-    <td>Method to install consul with when using default recipe: binary or source</td>
-    <td><tt>binary</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['install_dir']</tt></td>
-    <td>String</td>
-    <td>Directory to install binary to.</td>
-    <td><tt>/usr/local/bin</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['service_mode']</tt></td>
-    <td>String</td>
-    <td>Mode to run consul as: bootstrap, cluster, server, or client</td>
-    <td><tt>bootstrap</tt></td>
-  </tr>
-    <tr>
-    <td><tt>['consul']['bootstrap_expect']</tt></td>
-    <td>String</td>
-    <td>When bootstrapping a cluster, the number of server nodes to expect.</td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['data_dir']</tt></td>
-    <td>String</td>
-    <td>Location to store consul's data in</td>
-    <td><tt>/var/lib/consul</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['config_dir']</tt></td>
-    <td>String</td>
-    <td>Location to read service definitions from (directoy will be created)</td>
-    <td><tt>/etc/consul.d</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['servers']</tt></td>
-    <td>Array Strings</td>
-    <td>Consul servers to join</td>
-    <td><tt>[]</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['retry_on_join']</tt></td>
-    <td>Boolean</td>
-    <td>Set to true to wait for servers to be up before try to elect a leader</td>
-    <td><tt>false</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['bind_addr']</tt></td>
-    <td>String</td>
-    <td>address that should be bound to for internal cluster communications</td>
-    <td><tt>0.0.0.0</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['datacenter']</tt></td>
-    <td>String</td>
-    <td>Name of Datacenter</td>
-    <td><tt>dc1</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['domain']</tt></td>
-    <td>String</td>
-    <td>Domain for service lookup dns queries</td>
-    <td><tt>.consul</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['enable_syslog']</tt></td>
-    <td>Boolean</td>
-    <td>enables logging to syslog</td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['log_level']</tt></td>
-    <td>String</td>
-    <td>
-      The level of logging to show after the Consul agent has started.
-      Available: "trace", "debug", "info", "warn", "err"
-    </td>
-    <td><tt>info</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['node_name']</tt></td>
-    <td>String</td>
-    <td>The name of this node in the cluster</td>
-    <td>hostname of the machine</td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['advertise_addr']</tt></td>
-    <td>String</td>
-    <td>address that we advertise to other nodes in the cluster</td>
-    <td>Value of <i>bind_addr</i></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['init_style']</tt></td>
-    <td>String</td>
-    <td>Service init mode for running consul as: init,  runit or systemd</td>
-    <td><tt>init</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['service_user']</tt></td>
-    <td>String</td>
-    <td>For runit/systemd service: run consul as this user (init uses 'root')</td>
-    <td><tt>consul</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['service_group']</tt></td>
-    <td>String</td>
-    <td>For runit/systemd service: run consul as this group (init uses 'root')</td>
-    <td><tt>consul</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['bind_interface']</tt></td>
-    <td>String</td>
-    <td>
-      Interface to bind to, such as 'eth1'.  Sets bind_addr
-      attribute to the IP of the specified interface if it exists.
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['advertise_interface']</tt></td>
-    <td>String</td>
-    <td>
-      Interface to advertise, such as 'eth1'.  Sets advertise_addr
-      attribute to the IP of the specified interface if it exists.
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['extra_params']</tt></td>
-    <td>hash</td>
-    <td>
-       Pass a hash of extra params to the default.json config file
-    </td>
-    <td><tt>{}</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['encrypt_enabled']</tt></td>
-    <td>Boolean</td>
-    <td>
-      To enable Consul gossip encryption
-    </td>
-    <td><tt>false</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['verify_incoming']</tt></td>
-    <td>Boolean</td>
-    <td>
-      If set to True, Consul requires that all incoming connections make use of TLS.
-    </td>
-    <td><tt>false</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['verify_outgoing']</tt></td>
-    <td>Boolean</td>
-    <td>
-      If set to True, Consul requires that all outgoing connections make use of TLS.
-    </td>
-    <td><tt>false</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['key_file']</tt></td>
-    <td>String</td>
-    <td>
-      The content of PEM encoded private key
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['key_file_path']</tt></td>
-    <td>String</td>
-    <td>
-      Path where the private key is stored on the disk
-    </td>
-    <td><tt>/etc/consul.d/key.pem</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['ca_file']</tt></td>
-    <td>String</td>
-    <td>
-      The content of PEM encoded ca cert
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['ca_file_path']</tt></td>
-    <td>String</td>
-    <td>
-      Path where ca is stored on the disk
-    </td>
-    <td><tt>/etc/consul.d/ca.pem</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['cert_file']</tt></td>
-    <td>String</td>
-    <td>
-      The content of PEM encoded cert. It should only contain the public key.
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['cert_file_path']</tt></td>
-    <td>String</td>
-    <td>
-        Path where cert is stored on the disk
-    </td>
-    <td><tt>/etc/consul.d/cert.pem</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['statsd_addr']</tt></td>
-    <td>String</td>
-    <td>This provides the address of a statsd instance (UDP).</td>
-    <td><tt>nil</tt></td>
-  </tr>
-</table>
-
-### Databag Attributes (optional)
-Following attributes, if exist in the [encrypted databag][7], override the node attributes
-
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Databag item</th>
-    <th>Type</th>
-    <th>Description</th>
-  </tr>
-  <tr>
-    <td><tt>key_file</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>The content of PEM encoded private key</td>
-  </tr>
-  <tr>
-    <td><tt>key_file_{fqdn}</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>Node's(identified by fqdn) unique PEM encoded private key. If it exists, it will override the databag and node key_file attribute</td>
-  </tr>
-  <tr>
-    <td><tt>ca_file</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>The content of PEM encoded ca cert</td>
-  </tr>
-  <tr>
-    <td><tt>encrypt</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>Consul Gossip encryption key</td>
-  </tr>
-  <tr>
-    <td><tt>cert_file</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>The content of PEM encoded cert</td>
-  </tr>
-  <tr>
-    <td><tt>cert_file_{fqdn}</tt></td>
-    <td>['consul']['encrypt']</td>
-    <td>String</td>
-    <td>Node's(identified by fqdn) unique PEM encoded cert. If it exists, it will override the databag and node cert_file attribute</td>
-  </tr>
-</table>
-
-### Consul UI Attributes
-
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><tt>['consul']['client_addr']</tt></td>
-    <td>String</td>
-    <td>Address to bind to</td>
-    <td><tt>0.0.0.0</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['client_interface']</tt></td>
-    <td>String</td>
-    <td>
-      Interface to advertise, such as 'eth1'.  Sets advertise_addr
-      attribute to the IP of the specified interface if it exists.
-    </td>
-    <td><tt>nil</tt></td>
-  </tr>
-  <tr>
-    <td><tt>['consul']['serve_ui']</tt></td>
-    <td>Boolean</td>
-    <td>Determines whether the consul service also serve's the UI</td>
-    <td><tt>false</tt></td>
-  </tr>
-</table>
-
-## Usage
-The easiest way to bootstrap a cluster is to use the cluster recipe
-and use [Chef provisioning][8] which is a relatively new
-extension. This extension allows you to use any driver and easily
-stand up a cluster. Once the [Chef Development Kit][9] has been
-installed you can run the following command to provision a cluster.
-
+### Client
+Out of the box the default recipe installs and configures the Consul
+agent to run as a service in _client mode_. The intent here is that
+your infrastructure already has a [quorum of servers][13]. In order
+to configure Consul to connect to your cluster you would supply an
+array of addresses for the Consul agent to join. This would be done
+in your [wrapper cookbook][2]:
 ```ruby
-gem install chef-provisioning chef-provisioning-fog
-export CHEF_DRIVER=fog:AWS
-chef-client -z cluster.rb
+node.default['consul']['config']['start_join'] = %w{c1.internal.corporate.com c2.internal.corporate.com c3.internal.corporate.com}
 ```
 
-Please follow the [Chef provisioning README][10] which provides more
-detailed information about provisioning. You'll need to configure
-your credentials prior to provisioning.
+### Server
+This cookbook is designed to allow for the flexibility to bootstrap a
+new cluster. The best way to do this is through the use of a
+[wrapper cookbook][2] which tunes specific node attributes for a
+production server deployment.
 
-### consul::default
-The default recipe will install the Consul agent using the
-`consul::install_binary` recipe. It will also configure and
-start consul at the machine boot.
+The [Consul cluster cookbook][14] is provided as an example.
 
-### consul::install_binary
-If you only wish to simply install the binary from the official
-mirror you simply include `consul::install_binary` in your node's
-`run_list`:
+## Advanced Usage
+As explained above this cookbook provides Chef primitives in the form
+of resource/provider to further manage the install and configuration
+of Consul. These primitives are what is used in the default recipe,
+and should be used in your own [wrapper cookbooks][2] for more
+advanced configurations.
 
-```json
-{
-  "run_list": [
-    "recipe[consul::install_binary]"
-  ]
-}
+### Configuration
+It is very important to understand that each resource/provider has
+defaults for some properties. Any changes to a resource's default
+properties may need to be also changed in other resources. The best
+example is the Consul configuration directory.
+
+In the example below we're going to change the configuration file from
+the default (/etc/consul.json) to one that may be on a special volume.
+It is obvious that we need to change the path where `consul_config`
+writes its file to, but it is less obvious that this needs to be
+passed into `consul_service`.
+
+Inside of a recipe in your [wrapper cookbook][2] you'll want to do
+something like the following block of code. It uses the validated
+input from the configuration resource and passes it into the service
+resource. This ensures that we're using the _same data_.
+```ruby
+config = consul_config '/data/consul/default.json'
+consul_service 'consul' do
+  config_file config.path
+end
+```
+### Watches/Definitions
+In order to provide an idempotent implementation of Consul
+watches and definitions. We write these out as
+a separate configuration file in the JSON file format. The provider
+for both of these resources are identical in functionality.
+
+Below is an example of writing a [Consul service definition][10] for
+the master instance of Redis. We pass in several parameters and tell
+the resource to notify the proper instance of the Consul service to
+reload.
+```ruby
+consul_definition 'redis' do
+  type 'service'
+  parameters(tags: %w{master}, address: '127.0.0.1', port: 6379)
+  notifies :reload, 'consul_service[consul]', :delayed
+end
 ```
 
-### consul::install_source
-Instead if you wish to install Consul from source you simply need
-to include `consul::install_source` in your node's `run_list`. This
-will also configure the Go language framework on the node to build
-the application.
-
-```json
-{
-  "run_list": [
-    "recipe[consul::install_source]"
-  ]
-}
+A [check definition][11] can easily be added as well. You simply have
+to change the type and pass in the correct parameters. The definition
+below checks memory utilization using a script on a ten second interval.
+```ruby
+consul_definition 'mem-util' do
+  type 'check'
+  parameters(script: '/usr/local/bin/check_mem.py', interval: '10s')
+  notifies :reload, 'consul_service[consul]', :delayed
+end
 ```
 
-### consul::ui
-Installing the separate Consul UI simply requires you to include
-the `consul::ui` recipe in your node's `run_list`.
-
-```json
-{
-  "run_list": [
-    "recipe[consul::ui]"
-  ]
-}
+A service definition with an integrated check can also be created. You will have to define a regular service and then add a check as a an additional parameter. The definition below checks if the vault service is healthy on a 10 second interval and 5 second timeout.
+```ruby
+consul_definition 'vault' do
+  type 'service'
+  parameters(
+    port:  8200,
+    address: '127.0.0.1',
+    tags: ['vault', 'http'],
+    check: {
+      interval: '10s',
+      timeout: '5s',
+      http: 'http://127.0.0.1:8200/v1/sys/health'
+    }
+  )
+  notifies :reload, 'consul_service[consul]', :delayed
+end
 ```
 
-### LWRP
+Finally, a [watch][9] is created below to tell the agent to monitor to
+see if an application has been deployed. Once that application is
+deployed a script is run locally. This can be used, for example, as a
+lazy way to clear a HTTP disk cache.
+```ruby
+consul_watch 'app-deploy' do
+  type 'event'
+  parameters(handler: '/usr/local/bin/clear-disk-cache.sh')
+  notifies :reload, 'consul_service[consul]', :delayed
+end
+```
 
-##### Adding key watch
-    consul_key_watch_def 'key-watch-name' do
-      key "/key/path"
-      handler "chef-client"
-    end
+A keen eye would notice that we are _delaying the reload of the Consul
+service instance_. The reason we do this is to minimize the number of
+times we need to tell Consul to actually reload configurations. If
+there are several definitions this may save a little time off your
+Chef run.
 
+### ACLs
+The `consul_acl` resource allows management of [Consul ACL rules][15]. Supported
+actions are `:create` and `:delete`. The `:create` action will update/insert
+as necessary.
 
-##### Adding event watch
-    consul_event_watch_def 'event-name' do
-      handler "chef-client"
-    end
+The `consul_acl` resource requires the [Diplomat Ruby API][16] gem to be
+installed and available to Chef before using the resource. This can be
+accomplished by including `consul::client_gem` recipe in your run list.
 
-##### Adding services watch
-    consul_services_watch_def 'services-name' do
-      handler "chef-client"
-    end
+In order to make the resource idempotent and only notify when necessary, the
+`id` field is always required (defaults to the name of the resource).
+If `type` is not provided, it will default to "client". The `acl_name`
+and `rules` attributes are also optional; if not included they will be empty
+in the resulting ACL.
 
-##### Adding service watch
-    consul_service_watch_def 'service-name' do
-		  passingonly true
-      handler "chef-client"
-    end
+The example below will create a client ACL token with an `ID` of the given UUID,
+`Name` of "AwesomeApp Token", and `Rules` of the given string.
+```ruby
+consul_acl '49f06aa9-782f-465a-becf-44f0aaefd335' do
+  acl_name 'AwesomeApp Token'
+  type 'client'
+  rules <<-EOS.gsub(/^\s{4}/, '')
+    key "" {
+      policy = "read"
+    }
+    service "" {
+      policy = "write"
+    }
+  EOS
+  auth_token node['consul']['config']['acl_master_token']
+end
+```
 
-##### Adding service without check
+### Execute
+The command-line agent provides a mechanism to facilitate remote
+execution. For example, this can be used to run the `uptime` command
+across your fleet of nodes which are hosting a particular API service.
+```ruby
+consul_execute 'uptime' do
+  options(service: 'api')
+end
+```
 
-    consul_service_def 'voice1' do
-      port 5060
-      tags ['_sip._udp']
-      notifies :reload, 'service[consul]'
-    end
+All of the [options available on the command-line][12] can be passed
+into the resource. This could potentially be a *very dangerous*
+operation. You should absolutely understand what you are doing. By the
+nature of this command it is _impossible_ for it to be idempotent.
 
-##### Adding services with checks
-
-    consul_service_def 'voice1' do
-      port 5060
-      tags ['_sip._udp']
-      check(
-        interval: '10s',
-        script: 'echo ok'
-      )
-      notifies :reload, 'service[consul]'
-    end
-
-    consul_service_def 'server1' do
-      port 80
-      tags ['http']
-      check(
-        interval: '10s',
-        http: 'http://localhost:80'
-      )
-      notifies :reload, 'service[consul]'
-    end
-
-##### Removing service
-
-    consul_service_def 'voice1' do
-      action :delete
-      notifies :reload, 'service[consul]'
-    end
-
-> Be sure to notify the Consul resource to restart when your service def changes.
-
-####  Getting Started
-
-To bootstrap a consul cluster follow the following steps:
- 0.  Make sure that ports 8300-8302 (by default, if you configured different ones open those)  UDP/TCP are all open.
- 1.  Bootstrap a few (preferablly 3 nodes) to be your consul servers, these will be the KV masters.
- 2.  Put `node['consul']['servers'] =["Array of the bootstrapped servers ips or dns names"]` in your environment.
- 3.  Apply the consul cookbook to these nodes with `node['consul']['service_mode'] = 'cluster'` (I put this in this in a CONSUL_MASTER role).
- 4.  Let these machines converge, once you can run `consul members` and get a list of all of the servers your ready to move on
- 5.  Apply the consul cookbook to the rest of your nodes with `node['consul']['service_mode'] = 'client'` (I put this in the environment)
- 6.  Start adding services and checks to your cookbooks.
- 7.  If you want to get values out of consul to power your chef, curl localhost:8500/v1/kv/key/path?raw in your cookbook.
-
-## Authors
-
-Created and maintained by [John Bellone][3] [@johnbellone][2] (<jbellone@bloomberg.net>) and a growing community of [contributors][4].
-
+[0]: http://blog.vialstudios.com/the-environment-cookbook-pattern/#theapplicationcookbook
 [1]: http://consul.io
-[2]: https://twitter.com/johnbellone
-[3]: https://github.com/johnbellone
-[4]: https://github.com/johnbellone/consul-cookbook/graphs/contributors
-[5]: http://travis-ci.org/johnbellone/consul-cookbook
-[6]: https://coveralls.io/r/johnbellone/consul-cookbook
-[7]: https://docs.getchef.com/essentials_data_bags.html
-[8]: https://github.com/opscode/chef-provisioning
-[9]: https://github.com/opscode/chef-dk
-[10]: https://github.com/opscode/chef-provisioning/blob/master/README.md
+[2]: http://blog.vialstudios.com/the-environment-cookbook-pattern#thewrappercookbook
+[3]: http://blog.vialstudios.com/the-environment-cookbook-pattern#thelibrarycookbook
+[4]: https://github.com/johnbellone/libartifact-cookbook
+[5]: https://github.com/poise/poise
+[6]: https://github.com/poise/poise-service
+[7]: https://github.com/skottler/selinux
+[8]: https://github.com/test-kitchen/test-kitchen
+[9]: https://consul.io/docs/agent/watches.html
+[10]: https://consul.io/docs/agent/services.html
+[11]: https://consul.io/docs/agent/checks.html
+[12]: https://consul.io/docs/commands/exec.html
+[13]:https://en.wikipedia.org/wiki/Quorum_(distributed_computing)
+[14]: https://github.com/johnbellone/consul-cluster-cookbook
+[15]: https://www.consul.io/docs/internals/acl.html
+[16]: https://github.com/WeAreFarmGeek/diplomat

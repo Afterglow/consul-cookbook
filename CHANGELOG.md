@@ -1,150 +1,141 @@
-# 0.10
-Fixes several bugs, minor enhancements and changes default version of
-Consul to 0.5.2.
+# Change Log
 
-* Enhancements
-  - Node attribute for specifying Consul log file. [@darron](https://github.com/darron)
-  - Recipe no longer tries to create directories twice. [@tiwilliam](https://github.com/tiwilliam)
-  - Add packagecloud install method. [@darron](https://github.com/darron)
-  - Add 'rejoin_after_leave' option. [@arodd](https://github.com/arodd)
-  - Add LWRP for services watch. [@hirocaster](https://github.com/hirocaster)
+## [Unreleased](https://github.com/johnbellone/consul-cookbook/tree/HEAD)
 
-* Bug Fixes
-  - #152 Remove +x permissions on upstart/systemd configs. [@dpkp](https://github.com/dpkp)
-  - #158 Fix sysvinit script by not quoting commands. [@hatchetation](https://github.com/hatchetation)
-  - #172 Adds missing bracket to restart subscription. [@YuukiARIA](https://github.com/YuukiARIA)
-  - #178 Ensures GOMAXPROCS is at least 2. [@tgwizard](https://github.com/tgwizard)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v2.0.0...HEAD)
 
-# 0.9.1
+**Closed issues:**
 
-* Bug Fixes
-  * Lock to Chef 11 compatible version of libarchive cookbook
+- no more web ui? [\#297](https://github.com/johnbellone/consul-cookbook/issues/297)
+- Windows 2012 R2 Issue [\#295](https://github.com/johnbellone/consul-cookbook/issues/295)
 
-# 0.9.0
+## [v2.0.0](https://github.com/johnbellone/consul-cookbook/tree/v2.0.0) (2016-03-17)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.5.0...v2.0.0)
 
-* Enhancements
-  - Adds support for publishing to statsd URL. [@akerekes](https://github.com/akerekes)
-  - Adds support for Arch Linux. ([@logankoester](https://github.com/logankoester))
-  - Adds systemd init style. [@logankoester](https://github.com/logankoester)
-  - Adds support for Consul HTTP checks. [@gavinheavyside](https://github.com/gavinheavyside)
-  - Bump default Consul installed version to 0.5.0
-* Bug Fixes
-  - Remove hard dependency on chef-provisioning cookbook.
-  - Sets correct ownership to Consul run user/group on service directories. [@thedebugger](https://github.com/thedebugger)
+**Implemented enhancements:**
 
-- Removes support for EL5 (CentOS 5) and Ubuntu 10.04.
+- sysvinit.service.erb has the consul service log to /dev/null [\#284](https://github.com/johnbellone/consul-cookbook/issues/284)
+- Refactor the population of TLS files to wrapper cookbooks? [\#247](https://github.com/johnbellone/consul-cookbook/issues/247)
 
-# 0.8.3
+**Fixed bugs:**
 
-* Bug Fixes
-  * Export GOMAXPROCS when using runit service style
+- Updating consul version does not restart consul [\#251](https://github.com/johnbellone/consul-cookbook/issues/251)
 
-# 0.8.2
+**Closed issues:**
 
-* Bug Fixes
-  * Set GOMAXPROCS when using runit service style
+- Key not found: "consul\_0.6.3\_linux\_amd64" [\#294](https://github.com/johnbellone/consul-cookbook/issues/294)
+- restart\_on\_update considered harmful [\#288](https://github.com/johnbellone/consul-cookbook/issues/288)
+- Use 'system' attribute when adding consul user & group [\#287](https://github.com/johnbellone/consul-cookbook/issues/287)
 
-# 0.8.1
+## [v1.5.0](https://github.com/johnbellone/consul-cookbook/tree/v1.5.0) (2016-03-07)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.4.3...v1.5.0)
 
-* Bug Fixes
-  * Vanilla init script now points to the proper Consul binary and data dir
+## [v1.4.3](https://github.com/johnbellone/consul-cookbook/tree/v1.4.3) (2016-02-08)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.4.2...v1.4.3)
 
-# 0.8.0
+## [v1.4.2](https://github.com/johnbellone/consul-cookbook/tree/v1.4.2) (2016-02-08)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.4.1...v1.4.2)
 
-* Enhancements
-  * Upgrading from one version to another of Consul is now supported. The Consul service will automatically restart after upgrade.
+## [v1.4.1](https://github.com/johnbellone/consul-cookbook/tree/v1.4.1) (2016-02-05)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.4.0...v1.4.1)
 
-* Bug Fixes
-  * Partial convergeances will now gracefully recover on the next chef run
-  * Upstart will now respawn Consul on crash
-  * It is no longer possible to set an invalid install method
+**Closed issues:**
 
-* Backwards incompatible changes
-  * 'consul/ui_dir' attribute was removed. This will automatically be placed within the directory configured by 'consul/data_dir' as 'ui'
+- New version? [\#258](https://github.com/johnbellone/consul-cookbook/issues/258)
 
-# 0.7.1
+## [v1.4.0](https://github.com/johnbellone/consul-cookbook/tree/v1.4.0) (2016-02-03)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.3.1...v1.4.0)
 
-* Bug Fixes
-  * Fixed: Reloading the Consul service when using the runit init style will
+**Implemented enhancements:**
 
-# 0.7.0
+- Consul ACL custom resource [\#240](https://github.com/johnbellone/consul-cookbook/issues/240)
 
-* Enhancements
-  * Added cluster recipe for easily provisioning new Consul clusters. See the README for details
-  * Added support for additional options for service_config
-  * Added support for Ubuntu 10.04
-  * Allow custom data bag / data bag item for Consul encrypt. Default data bag is still `consul` and default item is still `encrypt`
-  * Bump support for Golan cookbook `~> 1.4`
-  * Added `consul/retry_on_join` attribute which to specify `retry_join` strategy instead of the default: `start_join`
-  * Added consul_service_watch LWRP
+## [v1.3.1](https://github.com/johnbellone/consul-cookbook/tree/v1.3.1) (2015-10-07)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.3.0...v1.3.1)
 
-* Bug Fixes
-  * No longer overwrite service user/group attribute when using non-runit init styles
-  * Setting the version attribute will now point to the appropriate download URL
-  * Use ID attribute to identify consul check definition files instead of name. If no ID is present name will be used
+## [v1.3.0](https://github.com/johnbellone/consul-cookbook/tree/v1.3.0) (2015-10-07)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.2.0...v1.3.0)
 
-# 0.6.0
-* Add support for TLS, and gossip encryption
+## [v1.2.0](https://github.com/johnbellone/consul-cookbook/tree/v1.2.0) (2015-08-24)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.1.1...v1.2.0)
 
-New features:
-- Add [Chef Provisioning][7] recipe for bootstrapping a cluster.
-- Add LWRP for defining [an event watch][8] (thanks [@ericfode][9]
+## [v1.1.1](https://github.com/johnbellone/consul-cookbook/tree/v1.1.1) (2015-08-13)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.1.0...v1.1.1)
 
-# 0.4.4
-* Adds server list to a consul instance running as a cluster with a `bootstrap_expect` value greater than one.
+## [v1.1.0](https://github.com/johnbellone/consul-cookbook/tree/v1.1.0) (2015-08-13)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v1.0.0...v1.1.0)
 
-# 0.4.3
-* Fix race condition when installing Consul as a runit service
-* Documentation fixes
+**Closed issues:**
 
-# 0.4.2
-Bumps default version of Consul to 0.4.0
+- Update README with new, detailed examples. [\#200](https://github.com/johnbellone/consul-cookbook/issues/200)
 
-# 0.4.1
-Bumps default version of Consul to 0.3.1.
+## [v1.0.0](https://github.com/johnbellone/consul-cookbook/tree/v1.0.0) (2015-08-06)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.11.1...v1.0.0)
 
-Adds support to bind to the IP of a named interface.
-- bind_interface, advertise_interface, client_interface attributes
-  (thanks [@romesh-mccullough][5])
+## [v0.11.1](https://github.com/johnbellone/consul-cookbook/tree/v0.11.1) (2015-07-25)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.11.0...v0.11.1)
 
-Test/Quality Coverage
-- Expands test coverage to the `consul::ui` and `consul::_service` recipes.
-- Passes some more [rubocop][6] and [foodcritic][4] code quality tests.
-- Only test in Travis against rubies of future past.
+## [v0.11.0](https://github.com/johnbellone/consul-cookbook/tree/v0.11.0) (2015-07-23)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.10.1...v0.11.0)
 
-# 0.4.0
-Adds [ChefSpec][3] tests and software lint/metrics.
+## [v0.10.1](https://github.com/johnbellone/consul-cookbook/tree/v0.10.1) (2015-07-10)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.10.0...v0.10.1)
 
-Breaking Changes
-- Renames *binary_install* recipe to *install_binary*
-- Renames *source_install* recipe to *source_binary*
+## [v0.10.0](https://github.com/johnbellone/consul-cookbook/tree/v0.10.0) (2015-06-04)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.10...v0.10.0)
 
-# 0.3.0
-Bumps the release of [Consul][1] to 0.3.0.
+## [v0.10](https://github.com/johnbellone/consul-cookbook/tree/v0.10) (2015-06-04)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.9.1...v0.10)
 
-Adds Service LWRP (thanks [@reset][2]!)
+## [v0.9.1](https://github.com/johnbellone/consul-cookbook/tree/v0.9.1) (2015-03-30)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/0.9.0...v0.9.1)
 
-# 0.2.0
-Bumps the release of [Consul][1] to 0.2.0.
+## [0.9.0](https://github.com/johnbellone/consul-cookbook/tree/0.9.0) (2015-03-17)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.8.3...0.9.0)
 
-Adds `consul::service` recipe.
-Adds more tests.
+## [v0.8.3](https://github.com/johnbellone/consul-cookbook/tree/v0.8.3) (2015-02-14)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.8.2...v0.8.3)
 
-Bug Smashing
-- Source installation now works properly.
-- Test Kitchen shows all green!
+## [v0.8.2](https://github.com/johnbellone/consul-cookbook/tree/v0.8.2) (2015-02-11)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.8.1...v0.8.2)
 
-# 0.1.0
-Initial release of [Consul][1] cookbook.
+## [v0.8.1](https://github.com/johnbellone/consul-cookbook/tree/v0.8.1) (2015-02-06)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.8.0...v0.8.1)
 
-Source and binary installation recipes.
+## [v0.8.0](https://github.com/johnbellone/consul-cookbook/tree/v0.8.0) (2015-02-06)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.7.1...v0.8.0)
 
-[1]: http://consul.io
-[2]: https://github.com/reset
-[3]: https://github.com/sethvargo/chefspec
-[4]: http://acrmp.github.io/foodcritic/
-[5]: https://github.com/romesh-mccullough
-[6]: https://github.com/bbatsov/rubocop
-[7]: https://github.com/opscode/chef-provisioning
-[8]: http://www.consul.io/docs/commands/watch.html
-[9]: https://github.com/ericfode
+## [v0.7.1](https://github.com/johnbellone/consul-cookbook/tree/v0.7.1) (2015-01-24)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.7.0...v0.7.1)
+
+## [v0.7.0](https://github.com/johnbellone/consul-cookbook/tree/v0.7.0) (2015-01-23)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.6.0...v0.7.0)
+
+## [v0.6.0](https://github.com/johnbellone/consul-cookbook/tree/v0.6.0) (2014-12-11)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/0.5.1...v0.6.0)
+
+## [0.5.1](https://github.com/johnbellone/consul-cookbook/tree/0.5.1) (2014-11-06)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.4.3...0.5.1)
+
+## [v0.4.3](https://github.com/johnbellone/consul-cookbook/tree/v0.4.3) (2014-09-19)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/0.4.3...v0.4.3)
+
+## [0.4.3](https://github.com/johnbellone/consul-cookbook/tree/0.4.3) (2014-09-19)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.4.2...0.4.3)
+
+## [v0.4.2](https://github.com/johnbellone/consul-cookbook/tree/v0.4.2) (2014-09-15)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.3.1...v0.4.2)
+
+## [v0.3.1](https://github.com/johnbellone/consul-cookbook/tree/v0.3.1) (2014-08-29)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.3.0...v0.3.1)
+
+## [v0.3.0](https://github.com/johnbellone/consul-cookbook/tree/v0.3.0) (2014-07-04)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.2.2...v0.3.0)
+
+## [v0.2.2](https://github.com/johnbellone/consul-cookbook/tree/v0.2.2) (2014-05-31)
+[Full Changelog](https://github.com/johnbellone/consul-cookbook/compare/v0.2.0...v0.2.2)
+
+## [v0.2.0](https://github.com/johnbellone/consul-cookbook/tree/v0.2.0) (2014-05-09)
+
+
+\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*

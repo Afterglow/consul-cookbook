@@ -1,19 +1,14 @@
 ---
 language: ruby
-script: bin/rspec
+cache: bundler
+sudo: false
+notifications:
+  slack: bloomberg-rnd:BvYmxrV9xj902XWTRNrkLNkR
+script: bundle exec rake travis
 rvm:
-  - 2.1
+  - 2.2
 branches:
   only:
     - master
-builder_args: --jobs 7
-notifications:
-  irc:
-    channels:
-      - 'chat.freenode.net#bloomberg'
-    use_notice: true
-    skip_join: true
-    template:
-      - "%{message} (%{author}): %{build_url}"
 matrix:
   fast_finish: true

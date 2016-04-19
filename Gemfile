@@ -1,16 +1,27 @@
 source 'https://rubygems.org'
-gem 'berkshelf'
-gem 'rake'
-gem 'rspec'
-gem 'rubocop'
-gem 'foodcritic'
-gem 'tailor'
-gem 'coveralls', require: false
-gem 'stove'
+gem 'chef-vault', '~> 2.6'
+gem 'poise', '~> 2.2'
+gem 'poise-service', '~> 1.0'
+gem 'poise-boiler'
 
-group :test, :integration do
+group :lint do
+  gem 'rubocop'
+  gem 'foodcritic'
+end
+
+group :unit, :integration do
   gem 'chefspec'
-  gem 'test-kitchen'
-  gem 'kitchen-vagrant'
+  gem 'berkshelf'
   gem 'serverspec'
+end
+
+group :development do
+  gem 'awesome_print'
+  gem 'github_changelog_generator'
+  gem 'rake'
+  gem 'stove'
+end
+
+group :doc do
+  gem 'yard'
 end
